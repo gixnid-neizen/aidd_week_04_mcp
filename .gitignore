@@ -1,8 +1,12 @@
 __pycache__/
 *.pyc
 todo_db.json
+practice/agent/todo-demo-db.json
 *.json.tmp
 .env
 node_modules/
 .DS_Store
 practice/docker/settings.generated.json
+.venv/
+.env
+__pycache__/

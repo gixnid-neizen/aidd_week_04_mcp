@@ -1,0 +1,221 @@
+[
+  {
+    "updatedAt": "2026-11-08T02:50:14.000Z",
+    "createdAt": "2026-11-08T02:48:25.136Z",
+    "id": "OHgSzd6SCMkwPDPP",
+    "name": "TODO intake - deterministic rules",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "todo-intake-rules",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "id": "b34369b7-3f55-4165-ad66-80b35a4a424c",
+        "name": "Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          -688,
+          128
+        ],
+        "webhookId": "todo-intake-rules"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $input.first().json;\nconst message = String(input.body?.message ?? input.message ?? '').trim();\nif (!message) throw new Error('Provide a message in body.message');\nconst urgent = /\\b(urgent|critical|outage|срочно|авария|не работает)\\b/i.test(message);\nconst category = /\\b(payment|invoice|billing|оплат|сч[её]т)\\b/i.test(message) ? 'billing'\n  : /\\b(login|password|account|аккаунт|парол)\\b/i.test(message) ? 'account'\n  : /\\b(error|bug|broken|ошиб|не работает)\\b/i.test(message) ? 'technical'\n  : 'other';\nreturn [{ json: { title: message.slice(0, 200), category, urgent, priority: urgent ? 'high' : 'normal' } }];"
+        },
+        "id": "9907836f-abad-4925-83df-0e66f5c23fd0",
+        "name": "Classify by keywords",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -464,
+          128
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "rules-urgent-condition",
+                "leftValue": "={{ $json.urgent }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "cc26257a-858f-4bae-b6e4-e0e3b8958d9e",
+        "name": "Urgent?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          -240,
+          128
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://127.0.0.1:5000/api/tasks",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ { title: $json.title, priority: 'high', due: null } }}",
+          "options": {}
+        },
+        "id": "2c120f6b-e738-4298-93e8-cb849c8f773b",
+        "name": "Create high-priority TODO",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          0,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://127.0.0.1:5000/api/tasks",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ { title: $json.title, priority: 'normal', due: null } }}",
+          "options": {}
+        },
+        "id": "98724453-97bd-46ac-8743-c29e1c09f907",
+        "name": "Create normal-priority TODO",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          0,
+          240
+        ]
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "={{ { status: 'created', task: $json } }}",
+          "options": {}
+        },
+        "id": "7fd1694e-21ff-47f5-b403-f846b273fcc8",
+        "name": "Respond to Webhook",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.1,
+        "position": [
+          240,
+          128
+        ]
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Classify by keywords",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Classify by keywords": {
+        "main": [
+          [
+            {
+              "node": "Urgent?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Urgent?": {
+        "main": [
+          [
+            {
+              "node": "Create high-priority TODO",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Create normal-priority TODO",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create high-priority TODO": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create normal-priority TODO": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1"
+    },
+    "staticData": null,
+    "meta": null,
+    "pinData": {},
+    "versionId": "0a02c6f4-bda8-4a1b-b695-cac6a4f0510c",
+    "activeVersionId": "0a02c6f4-bda8-4a1b-b695-cac6a4f0510c",
+    "versionCounter": 3,
+    "triggerCount": 1,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-11-08T02:48:25.140Z",
+        "createdAt": "2026-11-08T02:48:25.140Z",
+        "role": "workflow:owner",
+        "workflowId": "OHgSzd6SCMkwPDPP",
+        "projectId": "GNkXp9swkS7Ij8Zb",
+        "project": {
+          "updatedAt": "2026-11-08T02:45:46.122Z",
+          "createdAt": "2026-11-08T02:41:10.735Z",
+          "id": "GNkXp9swkS7Ij8Zb",
+          "name": "Local Workflow <n8n-local@example.invalid>",
+          "type": "personal",
+          "icon": null,
+          "description": null
+        }
+      }
+    ]
+  }
+]
