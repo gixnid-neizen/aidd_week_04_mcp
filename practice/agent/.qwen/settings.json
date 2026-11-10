@@ -33,7 +33,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/default/projects/ai/aidd_week_04_mcp/.venv/bin/python \"$QWEN_PROJECT_DIR/.qwen/hooks/guard.py\"",
+            "command": "/home/default/projects/dz/aidd_week_04_mcp/.venv/bin/python \"$QWEN_PROJECT_DIR/.qwen/hooks/guard.py\"",
             "timeout": 10
           }
         ]
@@ -49,17 +49,58 @@
   },
     "mcpServers": {
     "todo": {
-      "command": "/home/default/projects/ai/aidd_week_04_mcp/.venv/bin/python",
-      "args": ["/home/default/projects/ai/aidd_week_04_mcp/practice/mcp/server.py"],
+      "command": "/home/default/projects/dz/aidd_week_04_mcp/.venv/bin/python",
+      "args": ["/home/default/projects/dz/aidd_week_04_mcp/practice/mcp/server.py"],
       "env": { "TODO_API_URL": "http://127.0.0.1:5000" }
     },
     "excel": {
-      "command": "/home/default/projects/ai/aidd_week_04_mcp/.venv/bin/excel-mcp-server",
+      "command": "/home/default/projects/dz/aidd_week_04_mcp/.venv/bin/excel-mcp-server",
       "args": [
         "stdio",
         "--allow-dir",
-        "/home/default/projects/ai/aidd_week_04_mcp/practice/agent"
+        "/home/default/projects/dz/aidd_week_04_mcp/practice/agent"
       ]
     }
+  },
+  "permissions": {
+    "allow": [
+      "mcp__excel__create_workbook",
+      "mcp__excel__write_range",
+      "mcp__excel__format_range",
+      "mcp__excel__list_workbooks",
+      "mcp__excel__set_sheet_layout",
+      "Bash(python3 *)",
+      "Bash(import *)",
+      "Bash(req *)",
+      "Bash(\"http://127.0.0.1:5000/api/tasks\", *)",
+      "Bash(with *)",
+      "Bash(as *)",
+      "Bash(tasks *)",
+      "Bash(resp)",
+      "Bash(no_due_api *)",
+      "Bash(\"due\")",
+      "Bash(is *)",
+      "Bash(no_due_done *)",
+      "Bash(no_due_open *)",
+      "Bash(nostatus *)",
+      "Bash(1 *)",
+      "Bash(pyeof)",
+      "Bash(cd *)",
+      "Bash(summary *)",
+      "Bash(vals *)",
+      "Bash(tasks.iter_rows)",
+      "Bash(break)",
+      "Bash(eof)",
+      "Bash(report_date *)",
+      "Bash(2026, *)",
+      "Bash(due_today *)",
+      "Bash(id_, *)",
+      "Bash(overdue.append *)",
+      "Bash(elif *)",
+      "Bash(due_today.append *)",
+      "Bash(data *)",
+      "Bash(ov *)",
+      "Bash(date.fromisoformat)"
+    ]
   }
 }
